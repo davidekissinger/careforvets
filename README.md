@@ -30,3 +30,10 @@ Do not use the website or contact form to collect protected health information.
 - Ink `#24233B`
 - Display font: Georgia
 - Interface/body: Aptos / Segoe UI fallback
+
+
+## v1.1 update
+- Header logo sizing adjusted so the full CareForVets logo remains visible on desktop and mobile.
+- Contact form now posts to an absolute `/success.html` confirmation route.
+- Removed the catch-all redirect that could intercept valid static pages; Netlify will use `404.html` automatically for missing routes.
+- Refined the post-submission confirmation page.
