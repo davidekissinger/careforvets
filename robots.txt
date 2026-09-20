@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://careforvets.com/sitemap.xml
