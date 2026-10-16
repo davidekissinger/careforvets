@@ -46,7 +46,7 @@ p{margin:.2rem 0 1rem}
 
 .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#fff 0%,#fff 56%,var(--off) 56%,var(--off) 100%)}
 .hero::after{content:"";position:absolute;right:-110px;top:-130px;width:410px;height:410px;background:url('images/careforvets-star.png') center/contain no-repeat;opacity:.035;transform:rotate(-12deg)}
-.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:4rem;align-items:center;padding:6.4rem 0 5.4rem}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:4rem;align-items:center;padding:3.4rem 0 5.0rem}
 .hero-copy .lead{margin-top:1.1rem}
 .hero-actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.7rem}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:46px;padding:.78rem 1.05rem;border-radius:999px;text-decoration:none;font-weight:800;border:1px solid transparent;transition:.2s ease;cursor:pointer}
@@ -111,10 +111,10 @@ p{margin:.2rem 0 1rem}
 
 @media(max-width:900px){
   .menu-toggle{display:block}.site-nav{position:absolute;left:1rem;right:1rem;top:92px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:1rem;display:none;flex-direction:column;align-items:stretch;gap:.2rem}.site-nav.open{display:flex}.site-nav a{padding:.75rem .8rem}.nav-cta{text-align:center}
-  .hero-grid,.split{grid-template-columns:1fr;gap:2.3rem}.hero-grid{padding:4.8rem 0}.hero-panel{max-width:700px}.grid-3{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}.process{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}.footer-grid>div:first-child{grid-column:1/-1}.section-header{display:block}.section-header .btn{margin-top:1rem}
+  .hero-grid,.split{grid-template-columns:1fr;gap:2.3rem}.hero-grid{padding:3.1rem 0 4.4rem}.hero-panel{max-width:700px}.grid-3{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}.process{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}.footer-grid>div:first-child{grid-column:1/-1}.section-header{display:block}.section-header .btn{margin-top:1rem}
 }
 @media(max-width:620px){
-  .container{width:min(var(--max),calc(100% - 1.35rem))}.nav-wrap{min-height:78px;padding:.35rem 0}.brand img{width:auto;height:62px;max-width:126px}.hero-grid{padding:3.9rem 0 4.2rem}.value-grid{grid-template-columns:1fr}.value-item{border-right:0;border-bottom:1px solid rgba(255,255,255,.13);justify-content:flex-start;padding-left:calc((100vw - min(var(--max),calc(100% - 1.35rem)))/2 + .2rem)}.section{padding:4rem 0}.process{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.footer-grid{grid-template-columns:1fr}.footer-grid>div:first-child{grid-column:auto}.callout{grid-template-columns:1fr;padding:1.55rem}.photo-frame,.photo-frame img{min-height:300px}
+  .container{width:min(var(--max),calc(100% - 1.35rem))}.nav-wrap{min-height:78px;padding:.35rem 0}.brand img{width:auto;height:62px;max-width:126px}.hero-grid{padding:2.5rem 0 3.8rem}.value-grid{grid-template-columns:1fr}.value-item{border-right:0;border-bottom:1px solid rgba(255,255,255,.13);justify-content:flex-start;padding-left:calc((100vw - min(var(--max),calc(100% - 1.35rem)))/2 + .2rem)}.section{padding:4rem 0}.process{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.footer-grid{grid-template-columns:1fr}.footer-grid>div:first-child{grid-column:auto}.callout{grid-template-columns:1fr;padding:1.55rem}.photo-frame,.photo-frame img{min-height:300px}
 }
 
 .success-card{max-width:780px;margin:0 auto;text-align:center;background:#fff;border:1px solid var(--line);border-radius:28px;padding:clamp(2rem,5vw,4rem);box-shadow:var(--shadow)}

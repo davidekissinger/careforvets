@@ -37,3 +37,7 @@ Do not use the website or contact form to collect protected health information.
 - Contact form now posts to an absolute `/success.html` confirmation route.
 - Removed the catch-all redirect that could intercept valid static pages; Netlify will use `404.html` automatically for missing routes.
 - Refined the post-submission confirmation page.
+
+
+## v1.2 update
+- Reduced homepage hero top padding on desktop, tablet, and mobile so the headline begins closer to the navigation while preserving breathing room and the existing visual hierarchy.
