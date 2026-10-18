@@ -34,3 +34,13 @@ Create a dedicated `CareForVets Dev` Supabase project, apply the migrations, con
 - Intended hostname: `portal.careforvets.com`
 - Current state: project shell created; Git repository/deploy connection still needs to be attached to the `portal/` base directory.
 - Existing public `careforvets.com` production project remains unchanged.
+
+
+## 2026-10-18 — Supabase project creation blocked by free-project limit
+
+- User approved creation of `CareForVets Dev` at the quoted $0/month cost.
+- Supabase rejected creation because the account already has the maximum two active free projects.
+- Active projects: `CareNova Response` and `david-personal-knowledge`.
+- `ClinicalSOS` is currently inactive.
+- No existing Supabase project was paused, renamed, reused, or modified.
+- Build can continue once the user chooses to pause one active project or upgrades capacity.
