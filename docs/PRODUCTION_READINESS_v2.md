@@ -38,8 +38,8 @@ The `careforvets-portal.netlify.app` authentication path has worked. Before swit
 - Ensure the signup/confirmation email template uses the redirect-aware destination (for example `{{ .RedirectTo }}`) where applicable.
 - Test a new confirmation/sign-in email; do not reuse links that contain an old session token.
 
-### 3. Enable leaked-password protection
-Supabase Security Advisor currently warns that leaked-password protection is disabled. Enable it in Supabase Auth password/security settings before public launch. This is a security hardening requirement even though the portal primarily uses email-link authentication.
+### 3. Password-security warning (plan-limited; reassess if auth model changes)
+Supabase's Attack Protection UI states that leaked-password protection is available only on Pro plan and above. The current CareForVets portal login implementation uses passwordless email sign-in links (`signInWithOtp`) and does not collect or authenticate with user passwords, so leaked-password protection is not directly applicable to the current portal login flow. Do not upgrade the project solely to clear this warning at MVP launch. Reassess this control before enabling password-based authentication or if the project plan changes. Confirm password-based signup/login remains unused in the portal. The Supabase Security Advisor warning may remain until the feature is available and enabled.
 
 ### 4. Finish external-partner end-to-end testing
 The admin review workflow has been tested, but the full external partner path has not yet been independently verified. Using a dedicated test partner account and synthetic files only:
