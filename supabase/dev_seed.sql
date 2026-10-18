@@ -73,3 +73,20 @@ select '[DEMO] Veteran Small-Business Resource', '[DEMO] Business Support Partne
 from public.service_categories c
 where c.slug='entrepreneurship'
 and not exists (select 1 from public.resources where title='[DEMO] Veteran Small-Business Resource');
+
+
+-- Enrich demo job-description content for job-detail testing.
+update public.jobs
+set description = 'This synthetic preview role represents a veteran-centered home-based nursing position. The RN would coordinate scheduled home visits, complete skilled nursing assessments within the scope of the role, provide patient and caregiver education, communicate changes in condition through the appropriate clinical chain, and collaborate with the interdisciplinary care team. The role is designed to demonstrate how CareForVets can present clinical opportunities with clear expectations, location, work setting, and compensation.',
+    requirements = 'DEMO requirements only — this is not a real opening. Example qualifications: active RN license in the state of practice; current CPR certification; strong clinical documentation and communication skills; ability to work independently in home and community settings; reliable transportation when travel is required; home health, community health, veteran care, or related experience preferred.'
+where title='[DEMO] Registered Nurse — Home-Based Care';
+
+update public.jobs
+set description = 'This synthetic preview role represents a veteran-centered scheduling and care-coordination position. The scheduler would manage visit calendars, communicate with clinicians and patients, help resolve scheduling conflicts, maintain accurate operational status, and support timely handoffs between referral, authorization, and care-delivery teams. The role demonstrates how CareForVets can include non-clinical healthcare careers alongside licensed clinical roles.',
+    requirements = 'DEMO requirements only — this is not a real opening. Example qualifications: healthcare scheduling, customer service, operations, logistics, or administrative experience; strong phone and written communication; comfort managing multiple priorities; attention to detail; experience with home health, staffing, scheduling software, or veteran-serving organizations preferred.'
+where title='[DEMO] Veteran Care Scheduler';
+
+update public.jobs
+set description = 'This synthetic preview role represents a physical therapy opportunity serving patients in home and community settings. The PT would evaluate functional mobility within the assigned scope, establish therapy goals, deliver skilled interventions, communicate progress, and collaborate with nursing and other disciplines. The role demonstrates how therapy careers can be incorporated into the CareForVets veteran workforce network.',
+    requirements = 'DEMO requirements only — this is not a real opening. Example qualifications: active Physical Therapist license in the state of practice; graduate of an accredited PT program; current CPR certification where required; strong documentation and patient-education skills; ability to travel to assigned care locations; home health, geriatric, rehabilitation, or veteran-care experience preferred.'
+where title='[DEMO] Physical Therapist';
