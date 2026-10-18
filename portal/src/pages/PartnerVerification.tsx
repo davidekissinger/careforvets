@@ -17,6 +17,7 @@ type VerificationCase = {
   agreement_status: string
   tax_reporting_status: string
   verification_status: string
+  final_review_status?: string
   risk_level: string
   next_action: string | null
   blockers: string[]
@@ -152,6 +153,14 @@ function badge(status: string) {
   return status.replaceAll('_', ' ')
 }
 
+function isAdministrativelyClosed(item: VerificationCase) {
+  return item.verification_status === 'paused'
+    || item.verification_status === 'declined'
+    || item.verification_status === 'approved'
+    || ['paused', 'declined', 'approved', 'changes_requested'].includes(item.final_review_status ?? '')
+    || (item.next_action ?? '').startsWith('Closed administratively')
+}
+
 export default function PartnerVerification() {
   const { user, demo } = useAuth()
   const [cases, setCases] = useState<VerificationCase[]>([])
@@ -218,9 +227,10 @@ export default function PartnerVerification() {
 
   const counts = useMemo(() => ({
     total: cases.length,
-    blocked: cases.filter((c) => !c.activation_ready).length,
-    ready: cases.filter((c) => c.activation_ready).length,
-    w9: cases.filter((c) => c.w9_required && c.w9_status !== 'accepted').length,
+    blocked: cases.filter((c) => !c.activation_ready && !isAdministrativelyClosed(c)).length,
+    ready: cases.filter((c) => c.activation_ready && !isAdministrativelyClosed(c)).length,
+    closed: cases.filter((c) => isAdministrativelyClosed(c)).length,
+    w9: cases.filter((c) => c.w9_required && c.w9_status !== 'accepted' && !isAdministrativelyClosed(c)).length,
   }), [cases])
 
   function persistDemo(nextCases: VerificationCase[], nextDocs: VerificationDocument[]) {
@@ -367,6 +377,7 @@ export default function PartnerVerification() {
         <div><span>Total cases</span><strong>{counts.total}</strong></div>
         <div><span>Blocked</span><strong>{counts.blocked}</strong></div>
         <div><span>Ready for review</span><strong>{counts.ready}</strong></div>
+        <div><span>Closed</span><strong>{counts.closed}</strong></div>
         <div><span>W-9 outstanding</span><strong>{counts.w9}</strong></div>
       </section>
 
@@ -398,8 +409,8 @@ export default function PartnerVerification() {
                       <p className="job-meta">{badge(item.partner_kind)} · {item.compensation_expected ? 'compensated' : 'no payment expected'}</p>
                       <h3>{item.organization_name}</h3>
                     </div>
-                    <span className={item.activation_ready ? 'status-badge ready' : 'status-badge blocked'}>
-                      {item.activation_ready ? 'Ready for final review' : 'Blocked'}
+                    <span className={isAdministrativelyClosed(item) ? 'status-badge closed' : item.activation_ready ? 'status-badge ready' : 'status-badge blocked'}>
+                      {isAdministrativelyClosed(item) ? 'Closed — not an external partner' : item.activation_ready ? 'Ready for final review' : 'Blocked'}
                     </span>
                   </div>
 
@@ -461,7 +472,7 @@ export default function PartnerVerification() {
                       <strong>Next action:</strong> {item.next_action ?? (item.verification_status === 'approved' ? 'Partner approved' : 'Review case')}
                       {item.blockers.length > 0 && <span> · Blockers: {item.blockers.join(', ')}</span>}
                     </div>
-                    {item.activation_ready && item.verification_status !== 'approved' && item.verification_status !== 'declined' && item.verification_status !== 'paused' && (
+                    {item.activation_ready && !isAdministrativelyClosed(item) && (
                       <NavLink className="button primary final-review-button" to={`/admin/partner-verification/${item.id}/review`}>
                         Final review
                       </NavLink>
