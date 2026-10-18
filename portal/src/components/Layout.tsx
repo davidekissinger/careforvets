@@ -13,9 +13,9 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <NavLink to="/dashboard" className="brand" aria-label="CareForVets portal home">
-          <span className="brand-star">★</span>
-          <span><strong>CareForVets</strong><small>Portal</small></span>
+        <NavLink to="/dashboard" className="brand portal-brand" aria-label="CareForVets portal home">
+          <img src="/careforvets-logo.png" alt="CareForVets" className="portal-logo" />
+          <span className="portal-label">Portal</span>
         </NavLink>
         <nav aria-label="Portal navigation">
           <NavLink to="/care">Care</NavLink>
