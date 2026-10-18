@@ -150,6 +150,18 @@ export default function PartnerVerification() {
   const [actionMessage, setActionMessage] = useState('')
 
   useEffect(() => {
+    if (!viewerDocument) return
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setViewerDocument(null)
+        setViewerUrl(null)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [viewerDocument])
+
+  useEffect(() => {
     if (demo) {
       const savedCases = localStorage.getItem('cfv_demo_partner_queue')
       const savedDocs = localStorage.getItem('cfv_demo_partner_docs')
@@ -443,43 +455,66 @@ export default function PartnerVerification() {
       </section>
 
       {viewerDocument && (
-        <section className="section-card document-viewer">
-          <div className="queue-header">
-            <div>
-              <p className="eyebrow">Document review</p>
-              <h2>{viewerDocument.document_name ?? badge(viewerDocument.document_type)}</h2>
-            </div>
-            <button className="button secondary" type="button" onClick={() => { setViewerDocument(null); setViewerUrl(null) }}>Close viewer</button>
-          </div>
-
-          {demo ? (
-            <div className="synthetic-w9">
-              <div className="synthetic-w9-head"><strong>FORM W-9 · SYNTHETIC PREVIEW</strong><span>Not a real tax document</span></div>
-              <dl>
-                <div><dt>Name</dt><dd>{viewerDocument.verification_case_id === 'demo-contractor' ? 'Alex Veteran Consulting' : 'Demo Therapy Vendor Group'}</dd></div>
-                <div><dt>Business name</dt><dd>CareForVets test data only</dd></div>
-                <div><dt>Federal tax classification</dt><dd>Demo classification</dd></div>
-                <div><dt>Address</dt><dd>123 Demo Street · Toledo, OH 43604</dd></div>
-                <div><dt>Taxpayer identification number</dt><dd>[REDACTED IN PREVIEW]</dd></div>
-                <div><dt>Certification</dt><dd>Synthetic document for workflow testing only.</dd></div>
-              </dl>
-            </div>
-          ) : viewerUrl ? (
-            <iframe className="document-frame" src={viewerUrl} title={viewerDocument.document_name ?? 'Partner document'} />
-          ) : (
-            <p>Document URL unavailable.</p>
-          )}
-
-          <div className="document-review-footer">
-            <span>Viewed: {viewerDocument.viewed_at ? new Date(viewerDocument.viewed_at).toLocaleString() : 'Not viewed'}</span>
-            {viewerDocument.status !== 'accepted' && (
-              <button className="button primary" type="button" disabled={!viewerDocument.viewed_at} onClick={() => void acceptW9(viewerDocument)}>
-                Accept reviewed W-9
+        <div
+          className="document-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.currentTarget === event.target) {
+              setViewerDocument(null)
+              setViewerUrl(null)
+            }
+          }}
+        >
+          <section className="document-modal" role="dialog" aria-modal="true" aria-labelledby="document-review-title">
+            <div className="document-modal-header">
+              <div>
+                <p className="eyebrow">Document review</p>
+                <h2 id="document-review-title">{viewerDocument.document_name ?? badge(viewerDocument.document_type)}</h2>
+              </div>
+              <button
+                className="document-modal-close"
+                type="button"
+                aria-label="Close document viewer"
+                onClick={() => { setViewerDocument(null); setViewerUrl(null) }}
+              >
+                ×
               </button>
-            )}
-            {viewerDocument.status === 'accepted' && <span className="status-badge ready">Accepted</span>}
-          </div>
-        </section>
+            </div>
+
+            <div className="document-modal-body">
+              {demo ? (
+                <div className="synthetic-w9">
+                  <div className="synthetic-w9-head"><strong>FORM W-9 · SYNTHETIC PREVIEW</strong><span>Not a real tax document</span></div>
+                  <dl>
+                    <div><dt>Name</dt><dd>{viewerDocument.verification_case_id === 'demo-contractor' ? 'Alex Veteran Consulting' : 'Demo Therapy Vendor Group'}</dd></div>
+                    <div><dt>Business name</dt><dd>CareForVets test data only</dd></div>
+                    <div><dt>Federal tax classification</dt><dd>Demo classification</dd></div>
+                    <div><dt>Address</dt><dd>123 Demo Street · Toledo, OH 43604</dd></div>
+                    <div><dt>Taxpayer identification number</dt><dd>[REDACTED IN PREVIEW]</dd></div>
+                    <div><dt>Certification</dt><dd>Synthetic document for workflow testing only.</dd></div>
+                  </dl>
+                </div>
+              ) : viewerUrl ? (
+                <iframe className="document-frame" src={viewerUrl} title={viewerDocument.document_name ?? 'Partner document'} />
+              ) : (
+                <p>Document URL unavailable.</p>
+              )}
+            </div>
+
+            <div className="document-review-footer">
+              <span>Viewed: {viewerDocument.viewed_at ? new Date(viewerDocument.viewed_at).toLocaleString() : 'Not viewed'}</span>
+              <div className="document-footer-actions">
+                <button className="button secondary" type="button" onClick={() => { setViewerDocument(null); setViewerUrl(null) }}>Close</button>
+                {viewerDocument.status !== 'accepted' && (
+                  <button className="button primary" type="button" disabled={!viewerDocument.viewed_at} onClick={() => void acceptW9(viewerDocument)}>
+                    Accept reviewed W-9
+                  </button>
+                )}
+                {viewerDocument.status === 'accepted' && <span className="status-badge ready">Accepted</span>}
+              </div>
+            </div>
+          </section>
+        </div>
       )}
     </Layout>
   )
