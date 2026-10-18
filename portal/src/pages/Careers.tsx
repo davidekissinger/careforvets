@@ -10,8 +10,8 @@ type Job = {
   employment_type: string | null
   remote_status: string | null
   compensation_text: string | null
-  organizations: { name: string } | null
-  occupations: { name: string } | null
+  organizations: { name: string }[] | null
+  occupations: { name: string }[] | null
 }
 
 export default function Careers() {
@@ -57,7 +57,7 @@ export default function Careers() {
             {jobs.map((job) => (
               <article className="job-card" key={job.id}>
                 <div>
-                  <p className="job-meta">{job.organizations?.name ?? 'Employer'} · {job.occupations?.name ?? 'Healthcare / operations'}</p>
+                  <p className="job-meta">{job.organizations?.[0]?.name ?? 'Employer'} · {job.occupations?.[0]?.name ?? 'Healthcare / operations'}</p>
                   <h3>{job.title}</h3>
                   <p>{[job.location_text, job.remote_status, job.employment_type].filter(Boolean).join(' · ')}</p>
                 </div>
