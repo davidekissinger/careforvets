@@ -478,6 +478,11 @@ export default function PartnerVerification() {
                       </NavLink>
                     )}
                     {item.verification_status === 'approved' && <span className="status-badge ready">Approved</span>}
+                    {item.id === '62fdbba6-ac49-4a92-99db-113d148eb9b5' && isAdministrativelyClosed(item) && (
+                      <NavLink className="button secondary final-review-button" to="/admin/test-document-cleanup">
+                        Remove test-only documents
+                      </NavLink>
+                    )}
                   </div>
                 </article>
               )
