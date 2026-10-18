@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase'
 
 export default function ClassificationReview(){
   const {caseId}=useParams()
-  const {user,demo}=useAuth()
+  const {user,accountType,profileLoading,demo}=useAuth()
   const [behavioral,setBehavioral]=useState('')
   const [financial,setFinancial]=useState('')
   const [relationship,setRelationship]=useState('')
@@ -54,7 +54,7 @@ export default function ClassificationReview(){
       return
     }
 
-    if(!user){
+    if(!user || accountType !== 'staff'){
       setMessage('Staff authentication required.')
       setSaving(false)
       return
@@ -73,8 +73,14 @@ export default function ClassificationReview(){
     setSaving(false)
   }
 
-  if(!user && !demo){
-    return <Layout><section className="login-card"><p className="eyebrow">Worker classification</p><h1>Staff access required.</h1><NavLink className="button secondary" to="/admin/partner-verification">Back to queue</NavLink></section></Layout>
+  if(!demo && profileLoading) return <Layout><section className="section-card"><p>Checking staff access…</p></section></Layout>
+
+  if(!demo && !user){
+    return <Layout><section className="login-card"><p className="eyebrow">Worker classification</p><h1>Sign in required.</h1><NavLink className="button primary" to="/login">Sign in</NavLink></section></Layout>
+  }
+
+  if(!demo && accountType !== 'staff'){
+    return <Layout><section className="login-card"><p className="eyebrow">Worker classification</p><h1>Staff access required.</h1><p>This workflow is restricted to authorized CareForVets staff.</p><NavLink className="button secondary" to="/dashboard">Return to portal</NavLink></section></Layout>
   }
 
   return <Layout>
