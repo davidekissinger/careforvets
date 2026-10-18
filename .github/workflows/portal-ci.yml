@@ -1,0 +1,29 @@
+name: CareForVets Portal CI
+
+on:
+  pull_request:
+    paths:
+      - "portal/**"
+      - "supabase/**"
+      - ".github/workflows/portal-ci.yml"
+  push:
+    branches:
+      - "BUILD-v2-careforVETS"
+    paths:
+      - "portal/**"
+      - "supabase/**"
+      - ".github/workflows/portal-ci.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
