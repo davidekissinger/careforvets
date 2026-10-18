@@ -58,10 +58,10 @@ export default function Careers() {
               <article className="job-card" key={job.id}>
                 <div>
                   <p className="job-meta">{job.organizations?.[0]?.name ?? 'Employer'} · {job.occupations?.[0]?.name ?? 'Healthcare / operations'}</p>
-                  <h3>{job.title}</h3>
+                  <h3><NavLink className="job-title-link" to={`/careers/${job.id}`}>{job.title}</NavLink></h3>
                   <p>{[job.location_text, job.remote_status, job.employment_type].filter(Boolean).join(' · ')}</p>
                 </div>
-                {job.compensation_text && <strong>{job.compensation_text}</strong>}
+                <div className="job-card-actions">{job.compensation_text && <strong>{job.compensation_text}</strong>}<NavLink className="job-detail-link" to={`/careers/${job.id}`}>View job →</NavLink></div>
               </article>
             ))}
           </div>

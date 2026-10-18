@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import Careers from './pages/Careers'
 import CareerProfile from './pages/CareerProfile'
 import Login from './pages/Login'
+import JobDetail from './pages/JobDetail'
 import Resources from './pages/Resources'
 
 const pillars = [
@@ -48,6 +49,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/care" element={<Care />} />
       <Route path="/careers" element={<Careers />} />
+      <Route path="/careers/:jobId" element={<JobDetail />} />
       <Route path="/career-profile" element={<CareerProfile />} />
       <Route path="/resources" element={<Resources />} />
       <Route path="/partners" element={<Partners />} />
