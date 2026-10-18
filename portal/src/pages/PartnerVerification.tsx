@@ -107,6 +107,18 @@ const demoDocumentSeed: VerificationDocument[] = [
     reviewed_at: null,
   },
   {
+    id: 'demo-agreement-contractor',
+    verification_case_id: 'demo-contractor',
+    document_type: 'contractor_agreement',
+    storage_path: null,
+    document_name: 'DEMO-Signed-Contractor-Agreement.pdf',
+    content_type: 'application/pdf',
+    status: 'uploaded',
+    viewed_at: null,
+    view_count: 0,
+    reviewed_at: null,
+  },
+  {
     id: 'demo-w9-vendor',
     verification_case_id: 'demo-vendor',
     document_type: 'w9',
@@ -218,16 +230,6 @@ export default function PartnerVerification() {
     localStorage.setItem('cfv_demo_partner_docs', JSON.stringify(nextDocs))
   }
 
-  function updateDemoRequirement(id: string, field: 'classification' | 'agreement') {
-    if (!demo) return
-    const nextCases = cases.map((item) => {
-      if (item.id !== id) return item
-      if (field === 'classification') return recompute({ ...item, classification_status: 'contractor_supported' })
-      return recompute({ ...item, agreement_status: 'signed' })
-    })
-    persistDemo(nextCases, documents)
-  }
-
   async function viewDocument(doc: VerificationDocument) {
     setActionMessage('')
 
@@ -280,10 +282,10 @@ export default function PartnerVerification() {
     setViewerUrl(data.signedUrl)
   }
 
-  async function acceptW9(doc: VerificationDocument) {
+  async function acceptDocument(doc: VerificationDocument) {
     setActionMessage('')
     if (!doc.viewed_at) {
-      setActionMessage('Open and review the W-9 before marking it accepted.')
+      setActionMessage('Open and review the document before marking it accepted.')
       return
     }
 
@@ -292,45 +294,41 @@ export default function PartnerVerification() {
       const nextDocs = documents.map((item) =>
         item.id === doc.id ? { ...item, status: 'accepted', reviewed_at: now } : item
       )
-      const nextCases = cases.map((item) =>
-        item.id === doc.verification_case_id ? recompute({ ...item, w9_status: 'accepted' }) : item
-      )
+      const nextCases = cases.map((item) => {
+        if (item.id !== doc.verification_case_id) return item
+        if (doc.document_type === 'w9') return recompute({ ...item, w9_status: 'accepted' })
+        if (doc.document_type === 'contractor_agreement') return recompute({ ...item, agreement_status: 'signed' })
+        return item
+      })
       persistDemo(nextCases, nextDocs)
       setViewerDocument((current) => current?.id === doc.id ? { ...current, status: 'accepted', reviewed_at: now } : current)
-      setActionMessage('Synthetic W-9 accepted after document review.')
+      setActionMessage('Synthetic document accepted after review.')
       return
     }
 
     if (!user) return
-    const now = new Date().toISOString()
+    const { error } = await supabase.rpc('review_partner_document', {
+      target_document: doc.id,
+      target_status: 'accepted',
+      reviewer_note: null,
+    })
 
-    const { error: docError } = await supabase
-      .from('partner_verification_documents')
-      .update({
-        status: 'accepted',
-        reviewed_by: user.id,
-        reviewed_at: now,
-      })
-      .eq('id', doc.id)
-
-    if (docError) {
-      setActionMessage(docError.message)
+    if (error) {
+      setActionMessage(error.message)
       return
     }
 
-    const { error: caseError } = await supabase
-      .from('partner_verification_cases')
-      .update({ w9_status: 'accepted', updated_at: now })
-      .eq('id', doc.verification_case_id)
-
-    if (caseError) {
-      setActionMessage(caseError.message)
-      return
-    }
-
-    setDocuments((current) => current.map((item) => item.id === doc.id ? { ...item, status: 'accepted', reviewed_at: now } : item))
-    setCases((current) => current.map((item) => item.id === doc.verification_case_id ? recompute({ ...item, w9_status: 'accepted' }) : item))
-    setActionMessage('W-9 accepted after document review.')
+    const nextDocs = documents.map((item) => item.id === doc.id ? { ...item, status: 'accepted', reviewed_at: new Date().toISOString() } : item)
+    const nextCases = cases.map((item) => {
+      if (item.id !== doc.verification_case_id) return item
+      if (doc.document_type === 'w9') return recompute({ ...item, w9_status: 'accepted' })
+      if (doc.document_type === 'contractor_agreement') return recompute({ ...item, agreement_status: 'signed' })
+      return item
+    })
+    setDocuments(nextDocs)
+    setCases(nextCases)
+    setViewerDocument((current) => current?.id === doc.id ? { ...current, status: 'accepted', reviewed_at: new Date().toISOString() } : current)
+    setActionMessage('Document accepted after review.')
   }
 
   function resetDemo() {
@@ -392,6 +390,7 @@ export default function PartnerVerification() {
             {cases.map((item) => {
               const caseDocs = documents.filter((doc) => doc.verification_case_id === item.id)
               const w9Docs = caseDocs.filter((doc) => doc.document_type === 'w9')
+              const agreementDocs = caseDocs.filter((doc) => doc.document_type === 'contractor_agreement')
               return (
                 <article className="verification-card" key={item.id}>
                   <div className="verification-card-head">
@@ -417,7 +416,7 @@ export default function PartnerVerification() {
                               type="button"
                               className="accept-document"
                               disabled={!doc.viewed_at}
-                              onClick={() => void acceptW9(doc)}
+                              onClick={() => void acceptDocument(doc)}
                             >
                               Accept W-9
                             </button>
@@ -429,16 +428,30 @@ export default function PartnerVerification() {
                     <div>
                       <span>Classification</span>
                       <strong>{item.classification_review_required ? badge(item.classification_status) : 'not applicable'}</strong>
-                      {demo && item.classification_review_required && item.classification_status !== 'contractor_supported' && (
-                        <button type="button" onClick={() => updateDemoRequirement(item.id, 'classification')}>Simulate contractor review cleared</button>
+                      {item.classification_review_required && item.classification_status !== 'contractor_supported' && (
+                        <NavLink className="inline-action-link" to={`/admin/partner-verification/${item.id}/classification`}>Complete classification review →</NavLink>
                       )}
                     </div>
                     <div>
                       <span>Agreement</span>
                       <strong>{item.agreement_required ? badge(item.agreement_status) : 'not required'}</strong>
-                      {demo && item.agreement_required && item.agreement_status !== 'signed' && (
-                        <button type="button" onClick={() => updateDemoRequirement(item.id, 'agreement')}>Simulate agreement signed</button>
-                      )}
+                      {agreementDocs.map((doc) => (
+                        <div className="document-actions" key={doc.id}>
+                          <button type="button" onClick={() => void viewDocument(doc)}>View agreement</button>
+                          <small>{doc.viewed_at ? `Viewed · ${doc.view_count} time${doc.view_count === 1 ? '' : 's'}` : 'Not yet viewed'}</small>
+                          {doc.status !== 'accepted' && (
+                            <button
+                              type="button"
+                              className="accept-document"
+                              disabled={!doc.viewed_at}
+                              onClick={() => void acceptDocument(doc)}
+                            >
+                              Accept agreement
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      {item.agreement_required && agreementDocs.length === 0 && <small>No agreement uploaded yet.</small>}
                     </div>
                     <div><span>Tax reporting</span><strong>{badge(item.tax_reporting_status)}</strong></div>
                   </div>
@@ -492,15 +505,29 @@ export default function PartnerVerification() {
             <div className="document-modal-body">
               {demo ? (
                 <div className="synthetic-w9">
-                  <div className="synthetic-w9-head"><strong>FORM W-9 · SYNTHETIC PREVIEW</strong><span>Not a real tax document</span></div>
-                  <dl>
-                    <div><dt>Name</dt><dd>{viewerDocument.verification_case_id === 'demo-contractor' ? 'Alex Veteran Consulting' : 'Demo Therapy Vendor Group'}</dd></div>
-                    <div><dt>Business name</dt><dd>CareForVets test data only</dd></div>
-                    <div><dt>Federal tax classification</dt><dd>Demo classification</dd></div>
-                    <div><dt>Address</dt><dd>123 Demo Street · Toledo, OH 43604</dd></div>
-                    <div><dt>Taxpayer identification number</dt><dd>[REDACTED IN PREVIEW]</dd></div>
-                    <div><dt>Certification</dt><dd>Synthetic document for workflow testing only.</dd></div>
-                  </dl>
+                  {viewerDocument.document_type === 'w9' ? (
+                    <>
+                      <div className="synthetic-w9-head"><strong>FORM W-9 · SYNTHETIC PREVIEW</strong><span>Not a real tax document</span></div>
+                      <dl>
+                        <div><dt>Name</dt><dd>{viewerDocument.verification_case_id === 'demo-contractor' ? 'Alex Veteran Consulting' : 'Demo Therapy Vendor Group'}</dd></div>
+                        <div><dt>Business name</dt><dd>CareForVets test data only</dd></div>
+                        <div><dt>Federal tax classification</dt><dd>Demo classification</dd></div>
+                        <div><dt>Address</dt><dd>123 Demo Street · Toledo, OH 43604</dd></div>
+                        <div><dt>Taxpayer identification number</dt><dd>[REDACTED IN PREVIEW]</dd></div>
+                        <div><dt>Certification</dt><dd>Synthetic document for workflow testing only.</dd></div>
+                      </dl>
+                    </>
+                  ) : (
+                    <>
+                      <div className="synthetic-w9-head"><strong>CONTRACTOR / VENDOR AGREEMENT · SYNTHETIC PREVIEW</strong><span>Not a real agreement</span></div>
+                      <dl>
+                        <div><dt>Parties</dt><dd>CareForVets and Demo Partner</dd></div>
+                        <div><dt>Relationship</dt><dd>Independent contractor/vendor relationship subject to classification review.</dd></div>
+                        <div><dt>Tax documentation</dt><dd>Current Form W-9 required before payment activation.</dd></div>
+                        <div><dt>Execution</dt><dd>Synthetic signed-document workflow test only.</dd></div>
+                      </dl>
+                    </>
+                  )}
                 </div>
               ) : viewerUrl ? (
                 <iframe className="document-frame" src={viewerUrl} title={viewerDocument.document_name ?? 'Partner document'} />
@@ -515,7 +542,7 @@ export default function PartnerVerification() {
                 <button className="button secondary" type="button" onClick={() => { setViewerDocument(null); setViewerUrl(null) }}>Close</button>
                 {viewerDocument.status !== 'accepted' && (
                   <button className="button primary" type="button" disabled={!viewerDocument.viewed_at} onClick={() => void acceptW9(viewerDocument)}>
-                    Accept reviewed W-9
+                    Accept reviewed {viewerDocument.document_type === 'w9' ? 'W-9' : 'agreement'}
                   </button>
                 )}
                 {viewerDocument.status === 'accepted' && <span className="status-badge ready">Accepted</span>}
