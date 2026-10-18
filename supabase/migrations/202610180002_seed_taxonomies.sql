@@ -1,0 +1,41 @@
+insert into public.occupations (slug,name,category) values
+('rn','Registered Nurse (RN)','Nursing'),
+('lpn-lvn','Licensed Practical / Vocational Nurse (LPN/LVN)','Nursing'),
+('cna-stna','CNA / STNA','Nursing support'),
+('hha','Home Health Aide','Nursing support'),
+('msw-social-work','MSW / Social Work','Social work'),
+('pt','Physical Therapist (PT)','Therapy'),
+('pta','Physical Therapist Assistant (PTA)','Therapy'),
+('ot','Occupational Therapist (OT)','Therapy'),
+('cota','Certified Occupational Therapy Assistant (COTA)','Therapy'),
+('slp','Speech-Language Pathologist (SLP)','Therapy'),
+('speech-assistant','Speech-Language Assistant','Therapy'),
+('scheduler','Scheduler','Administration'),
+('intake','Intake Coordinator','Administration'),
+('authorization','Authorization Specialist','Administration'),
+('credentialing','Credentialing Specialist','Administration'),
+('billing-revenue-cycle','Billing / Revenue Cycle','Finance'),
+('recruiter','Recruiter','Talent'),
+('hr-people-ops','HR / People Operations','People'),
+('quality-compliance','Quality / Compliance','Quality'),
+('operations','Operations','Operations'),
+('branch-office-admin','Branch / Office Administration','Administration'),
+('clinical-operations','Clinical Operations','Operations'),
+('leadership-executive','Leadership / Executive','Leadership')
+on conflict (slug) do update set name=excluded.name,category=excluded.category,active=true;
+
+insert into public.service_categories (slug,name,description) values
+('healthcare','Healthcare','Healthcare and care-delivery resources'),
+('employment','Employment','Employment and workforce-development support'),
+('benefits','Benefits','Veteran benefits navigation and support'),
+('service-connection','Service Connection','Disability and service-connection support'),
+('education-training','Education & Training','Education, licensure, certification, and training resources'),
+('entrepreneurship','Entrepreneurship','Entrepreneurship and small-business resources'),
+('business-certification','Business Certification','Veteran and business certification resources'),
+('emergency-financial','Emergency Financial','Emergency financial assistance and stabilization resources'),
+('housing','Housing','Housing resources'),
+('legal','Legal','Legal support resources'),
+('transportation','Transportation','Transportation resources'),
+('behavioral-health-peer-support','Behavioral Health / Peer Support','Non-clinical routing to behavioral-health and peer-support resources'),
+('community','Community','Veteran and community organizations')
+on conflict (slug) do update set name=excluded.name,description=excluded.description,active=true;
