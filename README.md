@@ -41,3 +41,9 @@ Do not use the website or contact form to collect protected health information.
 
 ## v1.2 update
 - Reduced homepage hero top padding on desktop, tablet, and mobile so the headline begins closer to the navigation while preserving breathing room and the existing visual hierarchy.
+
+
+## v1.3 update
+- Added version query strings to CSS and JavaScript references so releases force a fresh browser request.
+- Changed CSS and JavaScript cache headers to revalidate immediately instead of remaining immutable for one year.
+- Images now use a one-day cache with revalidation.
