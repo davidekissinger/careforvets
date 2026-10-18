@@ -444,8 +444,16 @@ export default function PartnerVerification() {
                   </div>
 
                   <div className="queue-next-action">
-                    <strong>Next action:</strong> {item.next_action ?? 'Review case'}
-                    {item.blockers.length > 0 && <span> · Blockers: {item.blockers.join(', ')}</span>}
+                    <div>
+                      <strong>Next action:</strong> {item.next_action ?? (item.verification_status === 'approved' ? 'Partner approved' : 'Review case')}
+                      {item.blockers.length > 0 && <span> · Blockers: {item.blockers.join(', ')}</span>}
+                    </div>
+                    {item.activation_ready && item.verification_status !== 'approved' && item.verification_status !== 'declined' && item.verification_status !== 'paused' && (
+                      <NavLink className="button primary final-review-button" to={`/admin/partner-verification/${item.id}/review`}>
+                        Final review
+                      </NavLink>
+                    )}
+                    {item.verification_status === 'approved' && <span className="status-badge ready">Approved</span>}
                   </div>
                 </article>
               )

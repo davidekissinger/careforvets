@@ -5,6 +5,7 @@ import CareerProfile from './pages/CareerProfile'
 import Login from './pages/Login'
 import JobDetail from './pages/JobDetail'
 import PartnerVerification from './pages/PartnerVerification'
+import FinalPartnerReview from './pages/FinalPartnerReview'
 import Resources from './pages/Resources'
 
 const pillars = [
@@ -55,6 +56,7 @@ export default function App() {
       <Route path="/resources" element={<Resources />} />
       <Route path="/partners" element={<Partners />} />
       <Route path="/admin/partner-verification" element={<PartnerVerification />} />
+      <Route path="/admin/partner-verification/:caseId/review" element={<FinalPartnerReview />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
