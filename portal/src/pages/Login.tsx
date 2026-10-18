@@ -1,16 +1,18 @@
 import { FormEvent, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
 import { useAuth } from '../auth'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 
 export default function Login() {
-  const { user } = useAuth()
+  const { user, demo, enterDemo } = useAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [userType, setUserType] = useState('veteran')
   const [message, setMessage] = useState('')
+  const isPreview = window.location.hostname.includes('netlify.app') || window.location.hostname === 'localhost'
 
-  if (user) return <Navigate to="/dashboard" replace />
+  if (user || demo) return <Navigate to="/dashboard" replace />
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -31,12 +33,26 @@ export default function Login() {
     setMessage(error ? error.message : 'Check your email for a secure sign-in link.')
   }
 
+  function startDemo() {
+    enterDemo()
+    navigate('/dashboard')
+  }
+
   return (
     <Layout>
       <section className="login-card">
         <p className="eyebrow">Secure access</p>
         <h1>Sign in to CareForVets</h1>
         <p>Use your email to receive a passwordless sign-in link.</p>
+
+        {isPreview && (
+          <div className="test-panel">
+            <strong>Preview testing</strong>
+            <p>Enter test mode to review the portal without creating an account. Career-profile changes stay only in this browser and are labeled synthetic.</p>
+            <button className="button secondary" type="button" onClick={startDemo}>Enter test mode</button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <label htmlFor="account-type">I am joining as</label>
           <select id="account-type" value={userType} onChange={(e) => setUserType(e.target.value)}>
