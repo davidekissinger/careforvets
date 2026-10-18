@@ -135,7 +135,7 @@ function demoDocuments(caseId: string): ReviewDocument[] {
 export default function FinalPartnerReview() {
   const { caseId } = useParams()
   const navigate = useNavigate()
-  const { user, demo } = useAuth()
+  const { user, accountType, profileLoading, demo } = useAuth()
   const [reviewCase,setReviewCase] = useState<ReviewCase|null>(null)
   const [documents,setDocuments] = useState<ReviewDocument[]>([])
   const [services,setServices] = useState<string[]>([])
@@ -148,6 +148,7 @@ export default function FinalPartnerReview() {
 
   useEffect(()=>{
     if(!caseId) return
+    if(!demo && profileLoading) return
 
     if(demo){
       setReviewCase(demoCase(caseId))
@@ -159,11 +160,12 @@ export default function FinalPartnerReview() {
       return
     }
 
-    if(!user){
+    if(!user || accountType !== 'staff'){
       setLoading(false)
       return
     }
 
+    setLoading(true)
     async function load(){
       const [{data:caseData},{data:docData},{data:decisionData}] = await Promise.all([
         supabase.from('partner_final_review_staff_view').select('*').eq('id',caseId).maybeSingle(),
@@ -194,7 +196,7 @@ export default function FinalPartnerReview() {
     }
 
     void load()
-  },[caseId,demo,user])
+  },[caseId,demo,user,accountType,profileLoading])
 
   const blockers=useMemo(()=>reviewCase?.blockers ?? [],[reviewCase])
 
@@ -282,6 +284,16 @@ export default function FinalPartnerReview() {
     setDecisions((history ?? []) as Decision[])
     setMessage('Final-review decision recorded.')
     setSubmitting(false)
+  }
+
+  if(profileLoading && !demo) return <Layout><section className="section-card"><p>Checking staff access…</p></section></Layout>
+
+  if(!demo && !user) {
+    return <Layout><section className="login-card"><p className="eyebrow">Final partner review</p><h1>Sign in required.</h1><NavLink className="button primary" to="/login">Sign in</NavLink></section></Layout>
+  }
+
+  if(!demo && accountType !== 'staff') {
+    return <Layout><section className="login-card"><p className="eyebrow">Final partner review</p><h1>Staff access required.</h1><p>This workflow is restricted to authorized CareForVets staff.</p><NavLink className="button secondary" to="/dashboard">Return to portal</NavLink></section></Layout>
   }
 
   if(loading) return <Layout><p>Loading final review…</p></Layout>
