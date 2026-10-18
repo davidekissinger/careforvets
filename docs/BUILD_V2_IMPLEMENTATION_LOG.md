@@ -72,3 +72,17 @@ Create a dedicated `CareForVets Dev` Supabase project, apply the migrations, con
 - Latest BUILD v2 portal CI completed successfully.
 - Netlify portal visitor access was changed from team-SSO-only to public access so the eventual login page can be reached by external users.
 - Remaining deployment dependency: connect the Netlify `careforvets-portal` project to the GitHub repository/BUILD branch with `portal/` as the base directory, then configure the custom portal domain and Supabase Auth redirect allowlist.
+
+
+## 2026-10-18 — Performance hardening and functional portal flows
+
+- Added functional veteran career-profile editing backed by Supabase.
+- Added passwordless auth session handling and role-intent capture for veteran, employer, and partner sign-in.
+- Added public jobs and resources views with evidence-conscious empty states until real records are published.
+- Added CareForVets internal organization bootstrap and automatic profile creation for new auth users.
+- GitHub Actions detected and then cleared Supabase relation typing errors; latest BUILD v2 portal CI is successful.
+- Added indexes for foreign-key access paths and optimized auth lookups in RLS policies.
+- Supabase security advisor remains clean with zero security lints.
+- Remaining performance advisor notices are informational unused-index notices expected in an empty dev database and multiple-permissive-policy optimization warnings; neither is a security finding.
+- Netlify portal project is publicly reachable once deployed, and Supabase build-time environment variables are configured.
+- Remaining external deployment action: attach the Netlify project to GitHub branch `BUILD-v2-careforVETS` with base directory `portal/`, then add `portal.careforvets.com` and allow that callback URL in Supabase Auth.
