@@ -170,7 +170,7 @@ export default function PartnerOnboarding(){
     return <Layout><section className="login-card"><p className="eyebrow">Partner onboarding</p><h1>Sign in to begin partner verification.</h1><p>Create or use a partner account to submit your organization profile and required onboarding documents.</p><NavLink className="button primary" to="/login">Sign in</NavLink></section></Layout>
   }
 
-  const taxDocsRequired=state?.w9_required ?? compensation || ['contracted_vendor','independent_contractor','clinical_provider'].includes(partnerKind)
+  const taxDocsRequired=state?.w9_required ?? (compensation || ['contracted_vendor','independent_contractor','clinical_provider'].includes(partnerKind))
 
   return <Layout>
     <section className="hero compact">
