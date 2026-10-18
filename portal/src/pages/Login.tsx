@@ -10,7 +10,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [userType, setUserType] = useState('veteran')
   const [message, setMessage] = useState('')
-  const isPreview = window.location.hostname.includes('netlify.app') || window.location.hostname === 'localhost'
+  const isPreview = window.location.hostname.includes('deploy-preview') || window.location.hostname === 'localhost'
 
   if (user || demo) return <Navigate to="/dashboard" replace />
 
