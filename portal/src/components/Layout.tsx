@@ -3,11 +3,11 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth'
 
 export default function Layout({ children }: { children: ReactNode }) {
-  const { user, demo, signOut } = useAuth()
+  const { user, accountType, demo, signOut } = useAuth()
   const signedIn = Boolean(user || demo)
-  const accountType = user?.user_metadata?.user_type as string | undefined
   const showPartnerOnboarding = demo || accountType === 'partner'
   const showCareerProfile = demo || !accountType || accountType === 'veteran'
+  const showStaffVerification = demo || accountType === 'staff'
   const previewHost = window.location.hostname.includes('deploy-preview') || window.location.hostname === 'localhost'
 
   return (
@@ -23,6 +23,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <NavLink to="/resources">Resources</NavLink>
           <NavLink to="/partners">Partners</NavLink>
           {signedIn && showPartnerOnboarding && <NavLink to="/partner/onboarding">Partner onboarding</NavLink>}
+          {signedIn && showStaffVerification && <NavLink to="/admin/partner-verification">Verification</NavLink>}
           {signedIn && showCareerProfile && <NavLink to="/career-profile">My profile</NavLink>}
           {!signedIn && <NavLink to="/login">Sign in</NavLink>}
           {signedIn && <button className="nav-button" onClick={() => void signOut()}>{demo ? 'Exit test mode' : 'Sign out'}</button>}
