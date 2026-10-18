@@ -1,0 +1,12 @@
+create index if not exists idx_partner_classification_reviews_org on public.partner_classification_reviews(organization_id);
+create index if not exists idx_partner_classification_reviews_reviewed_by on public.partner_classification_reviews(reviewed_by);
+create index if not exists idx_partner_profiles_verification_owner on public.partner_profiles(verification_owner);
+create index if not exists idx_partner_verification_cases_assigned_to on public.partner_verification_cases(assigned_to);
+create index if not exists idx_partner_verification_cases_final_reviewed_by on public.partner_verification_cases(final_reviewed_by);
+create index if not exists idx_partner_verification_decisions_org on public.partner_verification_decisions(organization_id);
+create index if not exists idx_partner_verification_decisions_reviewer on public.partner_verification_decisions(reviewer_user_id);
+create index if not exists idx_partner_verification_decisions_case on public.partner_verification_decisions(verification_case_id);
+create index if not exists idx_partner_verification_documents_org on public.partner_verification_documents(organization_id);
+create index if not exists idx_partner_verification_documents_reviewed_by on public.partner_verification_documents(reviewed_by);
+create index if not exists idx_partner_verification_documents_uploaded_by on public.partner_verification_documents(uploaded_by);
+create index if not exists idx_partner_verification_documents_viewed_by on public.partner_verification_documents(viewed_by);

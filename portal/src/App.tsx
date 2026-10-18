@@ -7,6 +7,8 @@ import JobDetail from './pages/JobDetail'
 import PartnerVerification from './pages/PartnerVerification'
 import FinalPartnerReview from './pages/FinalPartnerReview'
 import Resources from './pages/Resources'
+import PartnerOnboarding from './pages/PartnerOnboarding'
+import ClassificationReview from './pages/ClassificationReview'
 
 const pillars = [
   { title: 'Care', body: 'Route veterans and families to the right next step without storing clinical records in this platform.', href: '/care' },
@@ -55,8 +57,10 @@ export default function App() {
       <Route path="/career-profile" element={<CareerProfile />} />
       <Route path="/resources" element={<Resources />} />
       <Route path="/partners" element={<Partners />} />
+      <Route path="/partner/onboarding" element={<PartnerOnboarding />} />
       <Route path="/admin/partner-verification" element={<PartnerVerification />} />
       <Route path="/admin/partner-verification/:caseId/review" element={<FinalPartnerReview />} />
+      <Route path="/admin/partner-verification/:caseId/classification" element={<ClassificationReview />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

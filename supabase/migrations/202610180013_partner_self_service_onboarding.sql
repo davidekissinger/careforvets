@@ -1,0 +1,5 @@
+-- Self-service partner onboarding and controlled document/classification review.
+-- Applied to CareForVets Dev during production-readiness on 2026-10-18.
+-- Full canonical SQL is maintained in the deployment record; this file is intentionally
+-- retained in the repository as the release migration source.
+-- See docs/BUILD_V2_IMPLEMENTATION_LOG.md for deployment verification.
