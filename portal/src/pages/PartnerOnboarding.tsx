@@ -48,11 +48,12 @@ export default function PartnerOnboarding(){
   useEffect(()=>{
     if(demo || !user || state) return
 
+    const userId=user.id
     async function loadExisting(){
       const {data:memberships}=await supabase
         .from('organization_memberships')
         .select('organization_id')
-        .eq('user_id',user.id)
+        .eq('user_id',userId)
         .eq('status','active')
         .limit(1)
 
