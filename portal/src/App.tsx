@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Careers from './pages/Careers'
 import CareerProfile from './pages/CareerProfile'
 import Login from './pages/Login'
 import JobDetail from './pages/JobDetail'
+import PartnerVerification from './pages/PartnerVerification'
 import Resources from './pages/Resources'
 
 const pillars = [
@@ -38,7 +39,7 @@ function Care() {
 }
 
 function Partners() {
-  return <Layout><section className="hero compact"><p className="eyebrow">Partners network</p><h1>From a links page to a closed-loop network.</h1><p className="lead">Partners will be structured by service, geography, eligibility, verification status, referral method, and their ability to close the loop on outcomes.</p></section><section className="section-card"><div className="empty-state"><h3>Partner verification queue is the next build.</h3><p>Organizations will not appear as CareForVets partners merely because they are useful resources. Relationship and verification status will be explicit.</p></div></section></Layout>
+  return <Layout><section className="hero compact"><p className="eyebrow">Partners network</p><h1>From a links page to a closed-loop network.</h1><p className="lead">Partners will be structured by service, geography, eligibility, verification status, referral method, and their ability to close the loop on outcomes.</p></section><section className="section-card"><div className="empty-state"><h3>Partner verification is now in BUILD v2.</h3><p>Organizations will not appear as CareForVets partners merely because they are useful resources. Relationship, compensation, W-9, classification, agreement, and tax-reporting requirements are tracked explicitly.</p><NavLink className="button primary" to="/admin/partner-verification">Open verification queue</NavLink></div></section></Layout>
 }
 
 export default function App() {
@@ -53,6 +54,7 @@ export default function App() {
       <Route path="/career-profile" element={<CareerProfile />} />
       <Route path="/resources" element={<Resources />} />
       <Route path="/partners" element={<Partners />} />
+      <Route path="/admin/partner-verification" element={<PartnerVerification />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
