@@ -6,8 +6,18 @@ import { supabase } from '../lib/supabase'
 
 type Occupation = { id: string; name: string; category: string }
 
+type DemoProfile = {
+  primaryOccupation: string
+  summary: string
+  years: string
+  geographies: string
+  remote: string
+  status: string
+  veteranAttested: boolean
+}
+
 export default function CareerProfile() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, demo, loading: authLoading } = useAuth()
   const [occupations, setOccupations] = useState<Occupation[]>([])
   const [primaryOccupation, setPrimaryOccupation] = useState('')
   const [summary, setSummary] = useState('')
@@ -25,6 +35,21 @@ export default function CareerProfile() {
   }, [])
 
   useEffect(() => {
+    if (demo) {
+      const saved = localStorage.getItem('cfv_demo_profile')
+      if (saved) {
+        const p = JSON.parse(saved) as DemoProfile
+        setPrimaryOccupation(p.primaryOccupation ?? '')
+        setSummary(p.summary ?? '')
+        setYears(p.years ?? '')
+        setGeographies(p.geographies ?? '')
+        setRemote(p.remote ?? 'open')
+        setStatus(p.status ?? 'open')
+        setVeteranAttested(Boolean(p.veteranAttested))
+      }
+      return
+    }
+
     if (!supabase || !user) return
     Promise.all([
       supabase.from('candidate_profiles').select('*').eq('user_id', user.id).maybeSingle(),
@@ -41,11 +66,19 @@ export default function CareerProfile() {
       }
       if (occupationResult.data?.occupation_id) setPrimaryOccupation(occupationResult.data.occupation_id)
     })
-  }, [user])
+  }, [user, demo])
 
   async function save(event: FormEvent) {
     event.preventDefault()
     setMessage('')
+
+    if (demo) {
+      const payload: DemoProfile = { primaryOccupation, summary, years, geographies, remote, status, veteranAttested }
+      localStorage.setItem('cfv_demo_profile', JSON.stringify(payload))
+      setMessage('Synthetic test profile saved in this browser only.')
+      return
+    }
+
     if (!supabase || !user) return
 
     const { error: profileError } = await supabase.from('candidate_profiles').upsert({
@@ -80,7 +113,7 @@ export default function CareerProfile() {
   }
 
   if (authLoading) return <Layout><p>Loading…</p></Layout>
-  if (!user) return (
+  if (!user && !demo) return (
     <Layout>
       <section className="login-card">
         <p className="eyebrow">Career profile</p>
@@ -94,15 +127,15 @@ export default function CareerProfile() {
   return (
     <Layout>
       <section className="hero compact">
-        <p className="eyebrow">My career profile</p>
+        <p className="eyebrow">{demo ? 'Synthetic test profile' : 'My career profile'}</p>
         <h1>Translate your experience into the work you want next.</h1>
-        <p className="lead">BUILD v2 starts with a simple profile. Credentials, documents, skills, applications, and employer matching will layer onto this foundation.</p>
+        <p className="lead">{demo ? 'Use fictional information while testing. Nothing on this form will be written to the CareForVets database.' : 'BUILD v2 starts with a simple profile. Credentials, documents, skills, applications, and employer matching will layer onto this foundation.'}</p>
       </section>
 
       <form className="profile-form" onSubmit={save}>
         <label className="checkbox-row">
           <input type="checkbox" checked={veteranAttested} onChange={(e) => setVeteranAttested(e.target.checked)} />
-          <span>I attest that I am a veteran or service member using this veteran career network.</span>
+          <span>{demo ? 'Synthetic test veteran/service-member attestation' : 'I attest that I am a veteran or service member using this veteran career network.'}</span>
         </label>
 
         <label>
@@ -115,7 +148,7 @@ export default function CareerProfile() {
 
         <label>
           Career summary
-          <textarea value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="A short professional summary. Do not include medical information." />
+          <textarea value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="Use fictional professional information in test mode. Do not include medical information." />
         </label>
 
         <div className="form-grid">
@@ -148,7 +181,7 @@ export default function CareerProfile() {
           </select>
         </label>
 
-        <button className="button primary" type="submit">Save career profile</button>
+        <button className="button primary" type="submit">Save {demo ? 'test' : 'career'} profile</button>
         {message && <p className="form-message" role="status">{message}</p>}
       </form>
     </Layout>
