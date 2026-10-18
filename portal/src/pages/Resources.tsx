@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
+import { useAuth } from '../auth'
+import { demoResources } from '../demoData'
 import { supabase } from '../lib/supabase'
 
 type Resource = {
@@ -15,14 +17,17 @@ type Resource = {
 }
 
 export default function Resources() {
+  const { demo } = useAuth()
   const [resources, setResources] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!supabase) {
+    if (demo) {
+      setResources(demoResources as unknown as Resource[])
       setLoading(false)
       return
     }
+
     supabase
       .from('resources')
       .select('id,title,provider_name,description,geography,website,verification_status,last_reviewed_at,service_categories(name)')
@@ -32,7 +37,7 @@ export default function Resources() {
         setResources((data ?? []) as Resource[])
         setLoading(false)
       })
-  }, [])
+  }, [demo])
 
   return (
     <Layout>
@@ -46,7 +51,7 @@ export default function Resources() {
         {loading ? <p>Loading resources…</p> : resources.length === 0 ? (
           <div className="empty-state">
             <h3>No resources are published yet.</h3>
-            <p>Prospective resources will stay unpublished until they have been reviewed and their provenance recorded.</p>
+            <p>Prospective resources remain unpublished until their source, relationship, and verification status have been reviewed.</p>
           </div>
         ) : (
           <div className="resource-grid">

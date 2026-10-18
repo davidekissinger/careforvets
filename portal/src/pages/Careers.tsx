@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import Layout from '../components/Layout'
+import { useAuth } from '../auth'
+import { demoJobs } from '../demoData'
 import { supabase } from '../lib/supabase'
 
 type Job = {
@@ -15,14 +17,17 @@ type Job = {
 }
 
 export default function Careers() {
+  const { demo } = useAuth()
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!supabase) {
+    if (demo) {
+      setJobs(demoJobs as unknown as Job[])
       setLoading(false)
       return
     }
+
     supabase
       .from('jobs')
       .select('id,title,location_text,employment_type,remote_status,compensation_text,organizations(name),occupations(name)')
@@ -32,7 +37,7 @@ export default function Careers() {
         setJobs((data ?? []) as Job[])
         setLoading(false)
       })
-  }, [])
+  }, [demo])
 
   return (
     <Layout>
@@ -46,11 +51,11 @@ export default function Careers() {
       </section>
 
       <section className="section-card">
-        <div className="section-heading"><div><p className="eyebrow">Open roles</p><h2>Published opportunities</h2></div></div>
+        <div className="section-heading"><div><p className="eyebrow">Open roles</p><h2>{demo ? 'Synthetic preview opportunities' : 'Published opportunities'}</h2></div></div>
         {loading ? <p>Loading opportunities…</p> : jobs.length === 0 ? (
           <div className="empty-state">
             <h3>No published jobs yet.</h3>
-            <p>The workforce foundation is live. Employer onboarding and the first verified opportunities are the next release step.</p>
+            <p>Verified employers and CareForVets staff will publish opportunities here as the network launches.</p>
           </div>
         ) : (
           <div className="job-list">
