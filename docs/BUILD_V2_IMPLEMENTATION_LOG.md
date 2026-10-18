@@ -25,3 +25,12 @@ This build is a veteran services/workforce platform, not an EHR, OASIS system, b
 
 ### Next dependency
 Create a dedicated `CareForVets Dev` Supabase project, apply the migrations, configure portal environment variables, and create the second Netlify portal project.
+
+
+## 2026-10-18 — Netlify portal project reserved
+
+- Netlify project created: `careforvets-portal`
+- Netlify site ID: `2f6e5c6b-dc09-4913-9dc7-ac4c3cc48bae`
+- Intended hostname: `portal.careforvets.com`
+- Current state: project shell created; Git repository/deploy connection still needs to be attached to the `portal/` base directory.
+- Existing public `careforvets.com` production project remains unchanged.
