@@ -68,12 +68,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfileLoading(false)
         }
       })
-      .catch(() => {
-        if (active) {
-          setAccountType(null)
-          setProfileLoading(false)
-        }
-      })
 
     return () => {
       active = false
