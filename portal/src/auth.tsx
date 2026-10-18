@@ -5,19 +5,26 @@ import { supabase } from './lib/supabase'
 type AuthState = {
   session: Session | null
   user: User | null
+  demo: boolean
   loading: boolean
   signOut: () => Promise<void>
+  enterDemo: () => void
+  exitDemo: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthState>({
   session: null,
   user: null,
+  demo: false,
   loading: true,
   signOut: async () => {},
+  enterDemo: () => {},
+  exitDemo: async () => {},
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
+  const [demo, setDemo] = useState(() => sessionStorage.getItem('cfv_demo_mode') === '1')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -39,12 +46,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => listener.subscription.unsubscribe()
   }, [])
 
-  async function signOut() {
+  function enterDemo() {
+    sessionStorage.setItem('cfv_demo_mode', '1')
+    setDemo(true)
+  }
+
+  async function exitDemo() {
+    sessionStorage.removeItem('cfv_demo_mode')
+    setDemo(false)
     if (supabase) await supabase.auth.signOut()
   }
 
+  async function signOut() {
+    await exitDemo()
+  }
+
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, demo, loading, signOut, enterDemo, exitDemo }}>
       {children}
     </AuthContext.Provider>
   )
