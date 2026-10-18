@@ -59,3 +59,16 @@ Create a dedicated `CareForVets Dev` Supabase project, apply the migrations, con
 - Hardened SECURITY DEFINER helper functions by moving them to a private schema and updated RLS policy references.
 - Security advisor result after hardening: no security lints.
 - Portal Netlify project still requires Git repository/deploy attachment before it can publish `portal.careforvets.com`.
+
+
+## 2026-10-18 — Authenticated careers/resource flows
+
+- Added Supabase auth session handling and passwordless sign-in UI.
+- Added automatic profile creation for new authenticated users.
+- Added a seeded internal `CareForVets` organization record.
+- Added functional veteran career-profile editing backed by Supabase.
+- Added public jobs and reviewed-resources data views with intentional empty states until real records are published.
+- GitHub Actions initially caught relation-typing errors in the Supabase joins; both were corrected.
+- Latest BUILD v2 portal CI completed successfully.
+- Netlify portal visitor access was changed from team-SSO-only to public access so the eventual login page can be reached by external users.
+- Remaining deployment dependency: connect the Netlify `careforvets-portal` project to the GitHub repository/BUILD branch with `portal/` as the base directory, then configure the custom portal domain and Supabase Auth redirect allowlist.
