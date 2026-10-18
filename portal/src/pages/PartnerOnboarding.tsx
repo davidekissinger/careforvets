@@ -22,7 +22,7 @@ const demoResult:OnboardingState={
 }
 
 export default function PartnerOnboarding(){
-  const {user,demo}=useAuth()
+  const {user,accountType,profileLoading,demo}=useAuth()
   const [categories,setCategories]=useState<Category[]>([])
   const [orgName,setOrgName]=useState('')
   const [website,setWebsite]=useState('')
@@ -46,7 +46,7 @@ export default function PartnerOnboarding(){
   },[])
 
   useEffect(()=>{
-    if(demo || !user || state) return
+    if(demo || !user || profileLoading || !['partner','employer'].includes(accountType ?? '') || state) return
 
     const userId=user.id
     async function loadExisting(){
@@ -96,7 +96,7 @@ export default function PartnerOnboarding(){
     }
 
     void loadExisting()
-  },[demo,user,state])
+  },[demo,user,accountType,profileLoading,state])
 
   useEffect(()=>{
     if(!demo || state) return
@@ -219,8 +219,14 @@ export default function PartnerOnboarding(){
     setSelectedServices(current=>current.includes(slug)?current.filter(x=>x!==slug):[...current,slug])
   }
 
+  if(!demo && profileLoading) return <Layout><section className="section-card"><p>Checking account access…</p></section></Layout>
+
   if(!user && !demo){
-    return <Layout><section className="login-card"><p className="eyebrow">Partner onboarding</p><h1>Sign in to begin partner verification.</h1><p>Create or use a partner account to submit your organization profile and required onboarding documents.</p><NavLink className="button primary" to="/login">Sign in</NavLink></section></Layout>
+    return <Layout><section className="login-card"><p className="eyebrow">Partner onboarding</p><h1>Sign in to begin partner verification.</h1><p>Choose Partner organization or Employer representative when signing in with a new account.</p><NavLink className="button primary" to="/login">Sign in</NavLink></section></Layout>
+  }
+
+  if(!demo && !['partner','employer'].includes(accountType ?? '')){
+    return <Layout><section className="login-card"><p className="eyebrow">Partner onboarding</p><h1>Partner or employer account required.</h1><p>This onboarding workflow is for external organizations. Use a separate partner/employer account; the internal CareForVets staff account is not an external partner.</p><NavLink className="button secondary" to="/dashboard">Return to portal</NavLink></section></Layout>
   }
 
   const taxDocsRequired=state?.w9_required ?? (compensation || ['contracted_vendor','independent_contractor','clinical_provider'].includes(partnerKind))
