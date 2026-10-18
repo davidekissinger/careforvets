@@ -541,7 +541,7 @@ export default function PartnerVerification() {
               <div className="document-footer-actions">
                 <button className="button secondary" type="button" onClick={() => { setViewerDocument(null); setViewerUrl(null) }}>Close</button>
                 {viewerDocument.status !== 'accepted' && (
-                  <button className="button primary" type="button" disabled={!viewerDocument.viewed_at} onClick={() => void acceptW9(viewerDocument)}>
+                  <button className="button primary" type="button" disabled={!viewerDocument.viewed_at} onClick={() => void acceptDocument(viewerDocument)}>
                     Accept reviewed {viewerDocument.document_type === 'w9' ? 'W-9' : 'agreement'}
                   </button>
                 )}
