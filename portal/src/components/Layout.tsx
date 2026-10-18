@@ -5,7 +5,7 @@ import { useAuth } from '../auth'
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, accountType, demo, signOut } = useAuth()
   const signedIn = Boolean(user || demo)
-  const showPartnerOnboarding = demo || accountType === 'partner'
+  const showPartnerOnboarding = demo || accountType === 'partner' || accountType === 'employer'
   const showCareerProfile = demo || !accountType || accountType === 'veteran'
   const showStaffVerification = demo || accountType === 'staff'
   const previewHost = window.location.hostname.includes('deploy-preview') || window.location.hostname === 'localhost'
