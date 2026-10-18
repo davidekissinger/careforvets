@@ -11,7 +11,7 @@ type Resource = {
   website: string | null
   verification_status: string
   last_reviewed_at: string | null
-  service_categories: { name: string } | null
+  service_categories: { name: string }[] | null
 }
 
 export default function Resources() {
@@ -52,7 +52,7 @@ export default function Resources() {
           <div className="resource-grid">
             {resources.map((resource) => (
               <article className="resource-card" key={resource.id}>
-                <p className="job-meta">{resource.service_categories?.name ?? 'Resource'} · {resource.verification_status}</p>
+                <p className="job-meta">{resource.service_categories?.[0]?.name ?? 'Resource'} · {resource.verification_status}</p>
                 <h3>{resource.title}</h3>
                 {resource.provider_name && <strong>{resource.provider_name}</strong>}
                 <p>{resource.description}</p>
