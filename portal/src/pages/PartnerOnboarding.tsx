@@ -46,6 +46,58 @@ export default function PartnerOnboarding(){
   },[])
 
   useEffect(()=>{
+    if(demo || !user || state) return
+
+    async function loadExisting(){
+      const {data:memberships}=await supabase
+        .from('organization_memberships')
+        .select('organization_id')
+        .eq('user_id',user.id)
+        .eq('status','active')
+        .limit(1)
+
+      const orgId=memberships?.[0]?.organization_id
+      if(!orgId) return
+
+      const [{data:org},{data:profile},{data:caseData},{data:serviceData}]=await Promise.all([
+        supabase.from('organizations').select('id,name,website,phone,service_area').eq('id',orgId).maybeSingle(),
+        supabase.from('partner_profiles').select('partner_kind,compensation_expected,referral_method,eligibility_summary,accepts_referrals,outcome_updates_supported').eq('organization_id',orgId).maybeSingle(),
+        supabase.from('partner_verification_cases').select('id,w9_required,agreement_required,classification_review_required').eq('organization_id',orgId).maybeSingle(),
+        supabase.from('partner_services').select('service_categories(slug)').eq('partner_organization_id',orgId),
+      ])
+
+      if(org){
+        setOrgName(org.name??'')
+        setWebsite(org.website??'')
+        setPhone(org.phone??'')
+        setServiceArea((org.service_area??[]).join(', '))
+      }
+      if(profile){
+        setPartnerKind(profile.partner_kind??'resource_referral')
+        setCompensation(Boolean(profile.compensation_expected))
+        setReferralMethod(profile.referral_method??'')
+        setEligibility(profile.eligibility_summary??'')
+        setAcceptsReferrals(Boolean(profile.accepts_referrals))
+        setOutcomes(Boolean(profile.outcome_updates_supported))
+      }
+      if(serviceData){
+        setSelectedServices(serviceData.flatMap((row:any)=>row.service_categories?.map((x:any)=>x.slug)??[]).filter(Boolean))
+      }
+      if(caseData){
+        setState({
+          organization_id:orgId,
+          verification_case_id:caseData.id,
+          w9_required:Boolean(caseData.w9_required),
+          agreement_required:Boolean(caseData.agreement_required),
+          classification_review_required:Boolean(caseData.classification_review_required),
+        })
+      }
+    }
+
+    void loadExisting()
+  },[demo,user,state])
+
+  useEffect(()=>{
     if(!demo || state) return
     const saved=localStorage.getItem('cfv_demo_partner_onboarding')
     if(saved){
