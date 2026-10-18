@@ -5,6 +5,7 @@ import { supabase } from './lib/supabase'
 type AuthState = {
   session: Session | null
   user: User | null
+  accountType: string | null
   demo: boolean
   loading: boolean
   signOut: () => Promise<void>
@@ -15,6 +16,7 @@ type AuthState = {
 const AuthContext = createContext<AuthState>({
   session: null,
   user: null,
+  accountType: null,
   demo: false,
   loading: true,
   signOut: async () => {},
@@ -24,15 +26,11 @@ const AuthContext = createContext<AuthState>({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
+  const [accountType, setAccountType] = useState<string | null>(null)
   const [demo, setDemo] = useState(() => sessionStorage.getItem('cfv_demo_mode') === '1')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false)
-      return
-    }
-
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session)
       setLoading(false)
@@ -46,6 +44,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => listener.subscription.unsubscribe()
   }, [])
 
+  useEffect(() => {
+    const userId = session?.user.id
+    if (!userId) {
+      setAccountType(null)
+      return
+    }
+
+    let active = true
+    supabase
+      .from('profiles')
+      .select('user_type')
+      .eq('id', userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (active) setAccountType(data?.user_type ?? null)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [session?.user.id])
+
   function enterDemo() {
     sessionStorage.setItem('cfv_demo_mode', '1')
     setDemo(true)
@@ -54,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function exitDemo() {
     sessionStorage.removeItem('cfv_demo_mode')
     setDemo(false)
-    if (supabase) await supabase.auth.signOut()
+    await supabase.auth.signOut()
   }
 
   async function signOut() {
@@ -62,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, demo, loading, signOut, enterDemo, exitDemo }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, accountType, demo, loading, signOut, enterDemo, exitDemo }}>
       {children}
     </AuthContext.Provider>
   )
