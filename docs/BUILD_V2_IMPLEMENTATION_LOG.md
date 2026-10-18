@@ -44,3 +44,18 @@ Create a dedicated `CareForVets Dev` Supabase project, apply the migrations, con
 - `ClinicalSOS` is currently inactive.
 - No existing Supabase project was paused, renamed, reused, or modified.
 - Build can continue once the user chooses to pause one active project or upgrades capacity.
+
+
+## 2026-10-18 — CareForVets Dev created and initialized
+
+- Paused `CareNova Response` at the user's direction to free a Supabase free-project slot.
+- Created `CareForVets Dev` in the CareNova Supabase organization at $0/month.
+- Supabase project ID: `nokelqwbbhjsamyndoby`
+- Region: `us-east-2`
+- Applied foundation schema/RLS migration.
+- Applied occupation and service-category seed migration.
+- Configured the `careforvets-portal` Netlify project with the Supabase URL and publishable browser key.
+- Ran Supabase security advisors.
+- Hardened SECURITY DEFINER helper functions by moving them to a private schema and updated RLS policy references.
+- Security advisor result after hardening: no security lints.
+- Portal Netlify project still requires Git repository/deploy attachment before it can publish `portal.careforvets.com`.
