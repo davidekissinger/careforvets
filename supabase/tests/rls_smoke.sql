@@ -1,0 +1,13 @@
+-- CareForVets BUILD v2 RLS smoke-test checklist.
+-- Run in a disposable/dev environment with test users.
+
+-- 1. anon can read active occupations and service categories.
+-- 2. anon cannot read candidate_profiles, credentials, applications, referrals, or consent_records.
+-- 3. candidate A cannot read candidate B private profile, credentials, applications, or documents.
+-- 4. employer org A cannot manage jobs belonging to employer org B.
+-- 5. partner org A cannot read referrals assigned to partner org B.
+-- 6. candidate can read only referrals where veteran_user_id = auth.uid().
+-- 7. candidate document bucket path must begin with auth.uid().
+-- 8. staff privileges require active membership in an active CareForVets organization.
+-- 9. public resources require publication_status = 'published'.
+-- 10. public jobs require status = 'published'.
