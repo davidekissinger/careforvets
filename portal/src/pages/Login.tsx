@@ -53,19 +53,25 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="account-type">I am joining as</label>
-          <select id="account-type" value={userType} onChange={(e) => setUserType(e.target.value)}>
-            <option value="veteran">Veteran / candidate</option>
-            <option value="employer">Employer representative</option>
-            <option value="partner">Partner organization</option>
-          </select>
-          <label htmlFor="email">Email address</label>
-          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <button type="submit">Send sign-in link</button>
-        </form>
-        {!isSupabaseConfigured && <p className="setup-note">Supabase environment variables are not configured.</p>}
-        {message && <p className="form-message" role="status">{message}</p>}
+        {isPreview ? (
+          <p className="setup-note">Passwordless account sign-in is intentionally held for the custom portal domain. Use test mode for this deploy preview.</p>
+        ) : (
+          <>
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="account-type">I am joining as</label>
+              <select id="account-type" value={userType} onChange={(e) => setUserType(e.target.value)}>
+                <option value="veteran">Veteran / candidate</option>
+                <option value="employer">Employer representative</option>
+                <option value="partner">Partner organization</option>
+              </select>
+              <label htmlFor="email">Email address</label>
+              <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <button type="submit">Send sign-in link</button>
+            </form>
+            {!isSupabaseConfigured && <p className="setup-note">Supabase environment variables are not configured.</p>}
+            {message && <p className="form-message" role="status">{message}</p>}
+          </>
+        )}
       </section>
     </Layout>
   )
