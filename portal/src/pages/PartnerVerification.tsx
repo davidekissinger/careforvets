@@ -162,7 +162,7 @@ function isAdministrativelyClosed(item: VerificationCase) {
 }
 
 export default function PartnerVerification() {
-  const { user, demo } = useAuth()
+  const { user, accountType, profileLoading, demo } = useAuth()
   const [cases, setCases] = useState<VerificationCase[]>([])
   const [documents, setDocuments] = useState<VerificationDocument[]>([])
   const [loading, setLoading] = useState(true)
@@ -183,6 +183,8 @@ export default function PartnerVerification() {
   }, [viewerDocument])
 
   useEffect(() => {
+    if (!demo && profileLoading) return
+
     if (demo) {
       const savedCases = localStorage.getItem('cfv_demo_partner_queue')
       const savedDocs = localStorage.getItem('cfv_demo_partner_docs')
@@ -192,13 +194,14 @@ export default function PartnerVerification() {
       return
     }
 
-    if (!user) {
+    if (!user || accountType !== 'staff') {
       setCases([])
       setDocuments([])
       setLoading(false)
       return
     }
 
+    setLoading(true)
     async function loadQueue() {
       const { data: queueData } = await supabase
         .from('partner_verification_queue')
@@ -223,7 +226,7 @@ export default function PartnerVerification() {
     }
 
     void loadQueue()
-  }, [demo, user])
+  }, [demo, user, accountType, profileLoading])
 
   const counts = useMemo(() => ({
     total: cases.length,
@@ -363,6 +366,16 @@ export default function PartnerVerification() {
         </section>
       </Layout>
     )
+  }
+
+  if (!demo && profileLoading) return <Layout><section className="section-card"><p>Checking staff access…</p></section></Layout>
+
+  if (!demo && !user) {
+    return <Layout><section className="login-card"><p className="eyebrow">Partner verification</p><h1>Sign in required.</h1><p>This queue is restricted to CareForVets staff.</p><NavLink className="button primary" to="/login">Sign in</NavLink></section></Layout>
+  }
+
+  if (!demo && accountType !== 'staff') {
+    return <Layout><section className="login-card"><p className="eyebrow">Partner verification</p><h1>Staff access required.</h1><p>Your account does not have permission to use the partner verification queue.</p><NavLink className="button secondary" to="/dashboard">Return to portal</NavLink></section></Layout>
   }
 
   return (
