@@ -1,83 +1,75 @@
 # CareForVets BUILD v2 — Production Readiness
 
-**Status:** Release candidate hardening in progress  
-**Date:** 2026-10-18
+**Status:** Release candidate; custom-domain and security configuration gates remain  
+**Last verified:** 2026-10-18
 
-## Completed release gates
+## Verified complete
 
-- BUILD v2 synchronized with production Warm Stone v1.1 branding.
-- GitHub CI builds the Vite portal on every BUILD-v2 push.
-- Supabase platform foundation and partner-verification migrations applied.
-- Supabase security advisor: zero findings.
-- Partner verification includes:
-  - relationship classification,
-  - W-9 requirement logic,
-  - private tax-document storage,
-  - view-before-accept enforcement,
-  - contractor/vendor agreement review,
-  - independent-contractor classification review,
-  - final human approval gate,
-  - decision history and audit events.
-- Self-service partner onboarding implemented:
-  - organization profile,
-  - service categories,
-  - referral method,
-  - eligibility,
-  - compensation expectation,
-  - W-9 upload,
-  - contractor/vendor agreement upload,
-  - resumable onboarding.
-- Demo careers/resources moved to browser-local test data.
-- Database demo jobs, resources, and demo employer organization removed.
-- Partner foreign-key indexes added.
-- BUILD v2 is synchronized with main and is no longer behind production.
+- BUILD v2 is synchronized with production Warm Stone v1.1 branding and is 63 commits ahead of `main`, 0 behind.
+- Separate Netlify project `careforvets-portal` is connected to `davidekissinger/careforvets` and currently deploys branch `BUILD-v2-careforVETS` from base directory `portal`.
+- The latest portal production-context deploy is Ready; GitHub build checks passed.
+- The first real Auth user exists and has one active internal CareForVets `owner` membership. Profile type is `staff`.
+- Real login was completed in the browser; the authenticated portal displayed the staff Verification navigation.
+- Partner document review and final-review pages were exercised using the CareForVets internal/duplicate test case.
+- The document acceptance function was corrected to remove the ambiguous `reviewer_note` reference and to recalculate readiness after document decisions.
+- The internal CareForVets duplicate partner case is paused, marked administratively closed, and cannot be considered activation-ready.
+- Confirmed test-only W-9 and agreement files were deleted through the Storage API. Verification confirms zero matching Storage objects and zero document records; one cleanup audit event exists. Historical decision/audit records remain.
+- Database demo jobs and resources are removed (zero `[DEMO]` job/resource rows); preview demos use browser-local synthetic records.
+- Self-service partner onboarding, resumable organization profile, service categories, W-9/agreement upload, worker-classification review, final human approval, decision history, and audit-event workflows are implemented.
+- A database safeguard prevents an organization named CareForVets or classified as the internal platform from being approved as an external partner.
+- Supabase schema and partner queue now exclude administratively closed cases from activation readiness.
+- Partner foreign-key indexes were added.
+- GitHub build checks passed on the latest BUILD branch commit, and the latest Netlify portal preview is Ready.
 
-## Production release gates still requiring external/account configuration
+## Remaining release gates
 
-### 1. Netlify production portal connection
-Connect the existing Netlify project `careforvets-portal` to:
-- Repository: `davidekissinger/careforvets`
-- Production branch: `main`
-- Package/base directory: `portal`
-- Build command: `npm run build`
-- Publish directory: `dist`
+### 1. Add the custom portal domain
+In Netlify, open the `careforvets-portal` project → Domain management → Add a domain, and add:
 
-Do not replace the existing public `careforvets.com` site. The portal remains a separate application.
+`portal.careforvets.com`
 
-### 2. Portal custom domain
-Add `portal.careforvets.com` to the `careforvets-portal` Netlify project and create the required DNS record.
+Follow the exact DNS record/target Netlify displays. Do not guess the CNAME target. Keep the existing public `careforvets.com` site separate.
 
-### 3. Supabase Auth production URLs
-Configure the CareForVets Supabase project:
-- Site URL: `https://portal.careforvets.com`
-- Allowed redirect URL: `https://portal.careforvets.com/dashboard`
-- Keep deploy-preview URLs out of production authentication unless explicitly needed for QA.
+### 2. Add the custom-domain Auth redirect
+The `careforvets-portal.netlify.app` authentication path has worked. Before switching users to the custom domain, in Supabase → Authentication → URL Configuration:
+- Set Site URL to `https://portal.careforvets.com` once the custom domain is live.
+- Add `https://portal.careforvets.com/dashboard` to allowed redirect URLs.
+- Keep `https://careforvets-portal.netlify.app/dashboard` during transition/rollback.
+- Ensure the signup/confirmation email template uses the redirect-aware destination (for example `{{ .RedirectTo }}`) where applicable.
+- Test a new confirmation/sign-in email; do not reuse links that contain an old session token.
 
-### 4. First CareForVets staff user
-Create the first real authenticated CareForVets user, then add that user to the internal CareForVets organization with an authorized role such as `owner` or `admin`.
+### 3. Enable leaked-password protection
+Supabase Security Advisor currently warns that leaked-password protection is disabled. Enable it in Supabase Auth password/security settings before public launch. This is a security hardening requirement even though the portal primarily uses email-link authentication.
 
-### 5. Real end-to-end release test
-With the production portal URL and staff account:
-1. Sign in with a real magic link.
-2. Sign out and sign back in.
-3. Create a partner account.
-4. Complete partner onboarding.
-5. Upload a W-9.
-6. Upload a signed contractor/vendor agreement when required.
-7. Review documents as CareForVets staff.
-8. Complete worker-classification review when required.
-9. Conduct final partner review.
-10. Approve the partner.
-11. Verify organization/partner status and audit history.
-12. Confirm a partner user cannot access staff-only verification functions.
+### 4. Finish external-partner end-to-end testing
+The admin review workflow has been tested, but the full external partner path has not yet been independently verified. Using a dedicated test partner account and synthetic files only:
+1. Register/sign in as a partner.
+2. Create and resume the partner profile.
+3. Submit service area, service categories, referral method, eligibility, and compensation expectation.
+4. Upload a synthetic W-9 and synthetic signed agreement when required.
+5. Verify that the partner account cannot access staff-only verification/classification/final-review routes or data.
+6. Sign in as staff and review each document after opening it.
+7. Complete worker-classification review when applicable.
+8. Conduct final review on a genuinely external test partner with complete profile data.
+9. Verify approved status and audit trail.
+10. Remove test uploads/records afterward.
 
-## Production data policy
+Do not use the internal CareForVets platform record as the external partner in this test.
+
+### 5. Release branch cutover
+Keep PR #1 open and in draft until gates 1–4 are complete. Once they pass:
+- Merge BUILD v2 into `main`.
+- Change the `careforvets-portal` production branch to `main`.
+- Confirm the `main` deploy is Ready and that the custom-domain login and key routes still work.
+
+## Production data and privacy rules
 
 - No synthetic `[DEMO]` jobs, resources, organizations, or tax documents belong in production.
-- Preview/test mode uses browser-local synthetic records.
-- Clinical records, diagnoses, medications, assessments, OASIS data, plans of care, and other PHI remain outside CareForVets BUILD v2.
-- W-9 taxpayer identifiers remain inside private documents and are not copied into ordinary application tables.
+- Use browser-local synthetic data for preview demonstrations.
+- Do not enter clinical records, diagnoses, medications, assessments, OASIS data, plans of care, or other PHI into this portal.
+- Keep W-9 taxpayer IDs inside private documents; do not copy them into ordinary application tables.
+- Use synthetic W-9s and agreements in testing. Delete test files through Supabase Storage APIs, not direct SQL deletion from `storage.objects`.
 
-## Release decision
+## Current release decision
 
-Do not merge PR #1 solely to trigger the portal release until the Netlify portal connection and Supabase Auth URLs are configured. Once those external gates are complete, run the end-to-end release test and then merge the release candidate into `main`.
+**Do not merge yet.** The separate portal is deployed and real staff login has been demonstrated on the Netlify subdomain. Remaining gates are custom-domain/DNS, custom-domain Auth redirect, leaked-password protection, and the external partner-to-staff end-to-end test. After these pass, merge and switch the portal's production branch to `main`.
