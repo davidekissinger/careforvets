@@ -6,6 +6,7 @@ type AuthState = {
   session: Session | null
   user: User | null
   accountType: string | null
+  profileLoading: boolean
   demo: boolean
   loading: boolean
   signOut: () => Promise<void>
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthState>({
   session: null,
   user: null,
   accountType: null,
+  profileLoading: true,
   demo: false,
   loading: true,
   signOut: async () => {},
@@ -27,6 +29,7 @@ const AuthContext = createContext<AuthState>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [accountType, setAccountType] = useState<string | null>(null)
+  const [profileLoading, setProfileLoading] = useState(true)
   const [demo, setDemo] = useState(() => sessionStorage.getItem('cfv_demo_mode') === '1')
   const [loading, setLoading] = useState(true)
 
@@ -48,17 +51,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userId = session?.user.id
     if (!userId) {
       setAccountType(null)
+      setProfileLoading(false)
       return
     }
 
     let active = true
+    setProfileLoading(true)
     supabase
       .from('profiles')
       .select('user_type')
       .eq('id', userId)
       .maybeSingle()
       .then(({ data }) => {
-        if (active) setAccountType(data?.user_type ?? null)
+        if (active) {
+          setAccountType(data?.user_type ?? null)
+          setProfileLoading(false)
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setAccountType(null)
+          setProfileLoading(false)
+        }
       })
 
     return () => {
@@ -82,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, accountType, demo, loading, signOut, enterDemo, exitDemo }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, accountType, profileLoading, demo, loading, signOut, enterDemo, exitDemo }}>
       {children}
     </AuthContext.Provider>
   )
