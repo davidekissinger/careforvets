@@ -1,0 +1,76 @@
+name: Public site checks
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'feat/seo-public-site-*'
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'docs/seo/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'netlify.toml'
+      - '.github/workflows/public-site.yml'
+  push:
+    branches:
+      - main
+      - 'feat/seo-public-site-*'
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'docs/seo/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'netlify.toml'
+      - '.github/workflows/public-site.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-site:
+    # Existing portal branches and their pull requests are outside this workflow.
+    if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'feat/seo-public-site-')
+    # Pin an OS supported by Playwright 1.56.1; ubuntu-latest can advance beyond its dependency registry.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CONTACT_FORM_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build production public pages
+        run: npm run build
+        env:
+          CONTEXT: production
+      - name: Check static output and preview indexing
+        run: npm run test:static
+      - name: Install Chromium and its system dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Check responsive behavior and accessibility
+        run: npm run test:browser
+      - name: Upload public-page QA artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-site-qa-${{ github.run_id }}
+          path: artifacts/qa/
+          if-no-files-found: ignore
+          retention-days: 7
