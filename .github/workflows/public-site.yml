@@ -41,7 +41,8 @@ jobs:
   public-site:
     # Existing portal branches and their pull requests are outside this workflow.
     if: github.event_name != 'pull_request' || startsWith(github.head_ref, 'feat/seo-public-site-')
-    runs-on: ubuntu-latest
+    # Pin an OS supported by Playwright 1.56.1; ubuntu-latest can advance beyond its dependency registry.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       CONTACT_FORM_ENABLED: 'false'

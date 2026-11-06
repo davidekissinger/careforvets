@@ -1,6 +1,8 @@
 # Public website validation
 
-Validated November 6, 2026 on the `feat/seo-public-site-2026-11-06` implementation branch. Local runtime: Node 24.22.1, npm 11.9.0, Playwright 1.56.1 with Chromium, and axe-core via `@axe-core/playwright` 4.11.0. The committed workflow repeats the checks on Node 22.
+Validated November 6, 2026 on the `feat/seo-public-site-2026-11-06` implementation branch. Local runtime: Node 24.22.1, npm 11.9.0, Playwright 1.56.1 with Chromium, and axe-core via `@axe-core/playwright` 4.11.0. The committed workflow repeats the checks on Ubuntu 24.04 with Node 22.
+
+The CI runner is pinned to Ubuntu 24.04 because Playwright 1.56.1 includes an `ubuntu24.04-x64` native-dependency definition. The moving `ubuntu-latest` label resolved to Ubuntu 26.04.1 and failed Chromium installation before browser tests could run. The OS pin keeps the runner compatible with the existing dependency versions and test behavior.
 
 ## Results
 
