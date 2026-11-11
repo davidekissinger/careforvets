@@ -353,7 +353,7 @@ async function checkOutputIsolation() {
   sameSet(files.filter(file => file.endsWith('.html')), expectedHTML, 'Published HTML differs from the approved route manifest');
   const metadata = new Set(['sitemap.xml', 'robots.txt', '_redirects', '_headers']);
   for (const file of files) {
-    const allowedAsset = ['assets/styles.css', 'assets/site.js'].includes(file) ||
+    const allowedAsset = ['assets/styles.css', 'assets/site.js', 'assets/veterans-day.css', 'assets/veterans-day.js'].includes(file) ||
       /^assets\/images\/[a-z\d._/-]+\.(?:png|webp|jpg|jpeg|gif|svg|ico)$/i.test(file) ||
       /^assets\/fonts\/[a-z\d._/-]+\.(?:woff2?|ttf|otf)$/i.test(file);
     assert(expectedHTML.includes(file) || metadata.has(file) || allowedAsset,
